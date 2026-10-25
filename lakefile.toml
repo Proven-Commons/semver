@@ -1,0 +1,13 @@
+name = "semver"
+version = "0.1.0"
+defaultTargets = ["Semver", "Proofs", "semver"]
+
+[[lean_lib]]
+name = "Semver"
+
+[[lean_lib]]
+name = "Proofs"
+
+[[lean_exe]]
+name = "semver"
+root = "Main"
