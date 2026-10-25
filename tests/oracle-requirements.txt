@@ -1,0 +1,5 @@
+# The oracle for tests/run_tests.py, pinned by hash. The hashes are the
+# ones PyPI publishes for semver 3.1.0.
+semver==3.1.0 \
+    --hash=sha256:6e4998f8b4762acdfea85f9bfd5b4032e0bb50038dc04bf82011b42d5d1145c5 \
+    --hash=sha256:14bc073439513d7773662a338f4db9829cf16c12b74b9568e2d2689975fbd7fc
