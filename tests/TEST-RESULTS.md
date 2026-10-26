@@ -7,7 +7,7 @@ Written by `tests/run_tests.py`. Rerun it to check these numbers.
 - Seed: 20261025
 - Inputs: 3021721
 - Mutated: 449861 of the inputs are mutated versions
-- By kind: compare 150022, compare pool 6084, error 13, examples 85, grid 2015539, mutated 449861, random 100539, valid 299578
+- By kind: compare 150022, compare pool 6084, error 13, examples 85, grid 2015539, mutated 449861, random string 100539, random version 299578
 - Strings parsed: 2865602, of which 442325 accepted and 2423277 rejected
 - Accepted versions with a number of 2**64 or more: 72009
 - Pairs compared: 156106: < 66963, = 27956, > 61187, REJECT 0
