@@ -1,0 +1,12 @@
+{
+  "challenge_module": "Spec",
+  "solution_module": "Proofs",
+  "theorem_names": [
+    "Spec.print_eq", "Spec.parse_iff", "Spec.parse_isSome_iff", "Spec.parse_valid",
+    "Spec.parse_print", "Spec.print_parse", "Spec.compare_eq", "Spec.compare_build",
+    "Spec.compare_eq_eq_iff", "Spec.compare_swap", "Spec.compare_trans", "Spec.compare_lt_trans",
+    "Spec.semver_examples", "Spec.precedence_examples", "Spec.reject_vectors",
+    "Spec.accept_vectors"
+  ],
+  "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"]
+}
