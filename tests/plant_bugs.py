@@ -75,7 +75,7 @@ def failures(copy, count):
     if not record.exists():
         return None, f"no record written, exit status {run.returncode}\n{out}"
     m = re.search(r"^- Failures: (\d+)(.*)$", record.read_text(encoding="utf-8"), re.M)
-    if m is None or "build" in m.group(2):
+    if m is None or m.group(2).strip():
         return None, out  # the bug did not build: not a catch
     n = int(m.group(1))
     if run.returncode != (1 if n else 0):
