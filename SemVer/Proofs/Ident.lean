@@ -3,21 +3,21 @@
   grammar's `<pre-release identifier>` and `<build identifier>`.
 -/
 
-import Proofs.Numeric
-import Proofs.Lists
+import SemVer.Proofs.Numeric
+import SemVer.Proofs.Lists
 
 open SemVer
 
 namespace SemVer.Proofs
 
 theorem all_isIdentChar_iff {cs : List Char} :
-    cs.all isIdentChar = true ↔ ∀ d ∈ cs, Spec.IdentChar d := by
+    cs.all isIdentChar = true ↔ ∀ d ∈ cs, SemVer.Spec.IdentChar d := by
   simp [List.all_eq_true, isIdentChar_iff]
 
 /-- `<alphanumeric identifier>`: identifier characters, not all of them
     digits. -/
 theorem alnumIdent_iff {cs : List Char} :
-    Spec.AlnumIdent cs ↔ (∀ d ∈ cs, Spec.IdentChar d) ∧ ¬ ∀ d ∈ cs, Spec.Digit d := by
+    SemVer.Spec.AlnumIdent cs ↔ (∀ d ∈ cs, SemVer.Spec.IdentChar d) ∧ ¬ ∀ d ∈ cs, SemVer.Spec.Digit d := by
   constructor
   · rintro ⟨xs, c, ys, rfl, hc, hxs, hys⟩
     have hc' := (nonDigit_iff c).mp hc
@@ -38,7 +38,7 @@ theorem alnumIdent_iff {cs : List Char} :
 
 /-- `<build identifier>`: one or more identifier characters. -/
 theorem buildIdent_iff {cs : List Char} :
-    Spec.BuildIdent cs ↔ cs ≠ [] ∧ ∀ d ∈ cs, Spec.IdentChar d := by
+    SemVer.Spec.BuildIdent cs ↔ cs ≠ [] ∧ ∀ d ∈ cs, SemVer.Spec.IdentChar d := by
   constructor
   · rintro (h | ⟨hne, hd⟩)
     · refine ⟨?_, (alnumIdent_iff.mp h).1⟩
@@ -46,30 +46,30 @@ theorem buildIdent_iff {cs : List Char} :
       simp
     · exact ⟨hne, fun d h => digit_identChar (hd d h)⟩
   · rintro ⟨hne, hi⟩
-    by_cases hd : ∀ d ∈ cs, Spec.Digit d
+    by_cases hd : ∀ d ∈ cs, SemVer.Spec.Digit d
     · exact Or.inr ⟨hne, hd⟩
     · exact Or.inl (alnumIdent_iff.mpr ⟨hi, hd⟩)
 
-theorem identChar_of_validIdent {i : Ident} (h : Spec.ValidIdent i) :
-    ∀ d ∈ Spec.identChars i, Spec.IdentChar d := by
+theorem identChar_of_validIdent {i : Ident} (h : SemVer.Spec.ValidIdent i) :
+    ∀ d ∈ SemVer.Spec.identChars i, SemVer.Spec.IdentChar d := by
   cases i with
   | num n => exact fun d hd => digit_identChar (digit_of_mem_toDigits hd)
   | alnum s => exact (alnumIdent_iff.mp h).1
 
 theorem parsePreIdent_eq_some {cs : List Char} {i : Ident} :
-    parsePreIdent cs = some i ↔ Spec.ValidIdent i ∧ cs = Spec.identChars i := by
+    parsePreIdent cs = some i ↔ SemVer.Spec.ValidIdent i ∧ cs = SemVer.Spec.identChars i := by
   unfold parsePreIdent
   split
   · rename_i hd
     rw [all_isDigit_iff] at hd
     cases i with
     | num n =>
-      simp only [Option.map_eq_some_iff, Ident.num.injEq, exists_eq_right, Spec.ValidIdent,
-        true_and, Spec.identChars, Spec.decimal]
+      simp only [Option.map_eq_some_iff, Ident.num.injEq, exists_eq_right, SemVer.Spec.ValidIdent,
+        true_and, SemVer.Spec.identChars, SemVer.Spec.decimal]
       exact parseNumeric_eq_some
     | alnum s =>
       simp only [Option.map_eq_some_iff, reduceCtorEq, and_false, exists_false, false_iff,
-        not_and, Spec.ValidIdent, Spec.identChars]
+        not_and, SemVer.Spec.ValidIdent, SemVer.Spec.identChars]
       rintro h rfl
       exact (alnumIdent_iff.mp h).2 hd
   · rename_i hd
@@ -79,12 +79,12 @@ theorem parsePreIdent_eq_some {cs : List Char} {i : Ident} :
       rw [all_isIdentChar_iff] at hi
       cases i with
       | num n =>
-        simp only [Option.some.injEq, reduceCtorEq, Spec.ValidIdent, Spec.identChars,
-          Spec.decimal, true_and, false_iff]
+        simp only [Option.some.injEq, reduceCtorEq, SemVer.Spec.ValidIdent, SemVer.Spec.identChars,
+          SemVer.Spec.decimal, true_and, false_iff]
         rintro rfl
         exact hd (fun d h => digit_of_mem_toDigits h)
       | alnum s =>
-        simp only [Option.some.injEq, Ident.alnum.injEq, Spec.ValidIdent, Spec.identChars]
+        simp only [Option.some.injEq, Ident.alnum.injEq, SemVer.Spec.ValidIdent, SemVer.Spec.identChars]
         constructor
         · rintro rfl
           rw [String.toList_ofList]
@@ -98,7 +98,7 @@ theorem parsePreIdent_eq_some {cs : List Char} {i : Ident} :
       exact hi (identChar_of_validIdent hv)
 
 theorem parseBuildIdent_eq_some {cs : List Char} {s : String} :
-    parseBuildIdent cs = some s ↔ Spec.BuildIdent s.toList ∧ cs = s.toList := by
+    parseBuildIdent cs = some s ↔ SemVer.Spec.BuildIdent s.toList ∧ cs = s.toList := by
   unfold parseBuildIdent
   split
   · rename_i h
@@ -121,23 +121,23 @@ theorem parseBuildIdent_eq_some {cs : List Char} {s : String} :
 
 /-! ## Separators inside identifiers -/
 
-theorem not_mem_of_identChar {c : Char} (hc : ¬ Spec.IdentChar c) {cs : List Char}
-    (h : ∀ d ∈ cs, Spec.IdentChar d) : c ∉ cs :=
+theorem not_mem_of_identChar {c : Char} (hc : ¬ SemVer.Spec.IdentChar c) {cs : List Char}
+    (h : ∀ d ∈ cs, SemVer.Spec.IdentChar d) : c ∉ cs :=
   fun hm => hc (h c hm)
 
-theorem dot_not_mem_identChars {i : Ident} (h : Spec.ValidIdent i) : '.' ∉ Spec.identChars i :=
+theorem dot_not_mem_identChars {i : Ident} (h : SemVer.Spec.ValidIdent i) : '.' ∉ SemVer.Spec.identChars i :=
   not_mem_of_identChar not_identChar_dot (identChar_of_validIdent h)
 
-theorem plus_not_mem_identChars {i : Ident} (h : Spec.ValidIdent i) : '+' ∉ Spec.identChars i :=
+theorem plus_not_mem_identChars {i : Ident} (h : SemVer.Spec.ValidIdent i) : '+' ∉ SemVer.Spec.identChars i :=
   not_mem_of_identChar not_identChar_plus (identChar_of_validIdent h)
 
-theorem dot_not_mem_build {s : String} (h : Spec.BuildIdent s.toList) : '.' ∉ s.toList :=
+theorem dot_not_mem_build {s : String} (h : SemVer.Spec.BuildIdent s.toList) : '.' ∉ s.toList :=
   not_mem_of_identChar not_identChar_dot (buildIdent_iff.mp h).2
 
-theorem plus_not_mem_build {s : String} (h : Spec.BuildIdent s.toList) : '+' ∉ s.toList :=
+theorem plus_not_mem_build {s : String} (h : SemVer.Spec.BuildIdent s.toList) : '+' ∉ s.toList :=
   not_mem_of_identChar not_identChar_plus (buildIdent_iff.mp h).2
 
-theorem not_mem_toDigits {c : Char} (hc : ¬ Spec.Digit c) (n : Nat) : c ∉ Nat.toDigits 10 n :=
+theorem not_mem_toDigits {c : Char} (hc : ¬ SemVer.Spec.Digit c) (n : Nat) : c ∉ Nat.toDigits 10 n :=
   fun hm => hc (digit_of_mem_toDigits hm)
 
 end SemVer.Proofs

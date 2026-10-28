@@ -1,10 +1,10 @@
 /-
   What a version is: the values the parser produces and the printer
-  takes. Part of the approved specification, with `Spec.lean` and
+  takes. Part of the approved specification, with `SemVer/Spec.lean` and
   `Spec/Defs.lean`, since every statement is about these types.
 
   A value holds each part of a Semantic Versioning 2.0.0 string as
-  written. Which values are valid is `Spec.Valid`, in `Spec/Defs.lean`.
+  written. Which values are valid is `SemVer.Spec.Valid`, in `Spec/Defs.lean`.
 -/
 
 namespace SemVer

@@ -1,16 +1,16 @@
 /-
-  Numbers: `Nat.toDigits 10`, which `Spec.decimal` uses, writes exactly
+  Numbers: `Nat.toDigits 10`, which `SemVer.Spec.decimal` uses, writes exactly
   the numeric identifiers of the grammar, and `parseNumeric` reads them
   back.
 -/
 
-import Proofs.Chars
+import SemVer.Proofs.Chars
 
 open SemVer
 
 namespace SemVer.Proofs
 
-theorem digit_of_mem_toDigits {n : Nat} {c : Char} (h : c ∈ Nat.toDigits 10 n) : Spec.Digit c := by
+theorem digit_of_mem_toDigits {n : Nat} {c : Char} (h : c ∈ Nat.toDigits 10 n) : SemVer.Spec.Digit c := by
   have := Nat.isDigit_of_mem_toDigits (by decide) (by decide) h
   rw [Char.isDigit_iff_toNat] at this
   exact (digit_iff c).mpr this
@@ -27,7 +27,7 @@ theorem toDigits_head {n : Nat} (hn : 0 < n) :
       exact ⟨c, rest ++ _, by rw [h]; rfl, hc⟩
 
 theorem numericIdent_cons {c : Char} {cs : List Char} :
-    Spec.NumericIdent (c :: cs) ↔ (∀ d ∈ c :: cs, Spec.Digit d) ∧ (c ≠ '0' ∨ cs = []) := by
+    SemVer.Spec.NumericIdent (c :: cs) ↔ (∀ d ∈ c :: cs, SemVer.Spec.Digit d) ∧ (c ≠ '0' ∨ cs = []) := by
   constructor
   · rintro (h | ⟨c', rest, h, hc, hr⟩)
     · simp only [List.cons.injEq] at h
@@ -45,17 +45,17 @@ theorem numericIdent_cons {c : Char} {cs : List Char} :
       · exact Or.inr ⟨c, [], rfl, (positiveDigit_iff_digit c).mpr ⟨hd c (by simp), hc⟩,
           by simp⟩
 
-theorem numericIdent_toDigits (n : Nat) : Spec.NumericIdent (Nat.toDigits 10 n) := by
+theorem numericIdent_toDigits (n : Nat) : SemVer.Spec.NumericIdent (Nat.toDigits 10 n) := by
   rcases Nat.eq_zero_or_pos n with rfl | hn
   · exact Or.inl rfl
   · obtain ⟨c, rest, h, hc⟩ := toDigits_head hn
     rw [h, numericIdent_cons]
     exact ⟨fun d hd => digit_of_mem_toDigits (h ▸ hd), Or.inl hc⟩
 
-theorem numericIdent_ne_nil {cs : List Char} (h : Spec.NumericIdent cs) : cs ≠ [] := by
+theorem numericIdent_ne_nil {cs : List Char} (h : SemVer.Spec.NumericIdent cs) : cs ≠ [] := by
   rcases h with rfl | ⟨c, rest, rfl, _, _⟩ <;> simp
 
-theorem numericIdent_digits {cs : List Char} (h : Spec.NumericIdent cs) : ∀ d ∈ cs, Spec.Digit d := by
+theorem numericIdent_digits {cs : List Char} (h : SemVer.Spec.NumericIdent cs) : ∀ d ∈ cs, SemVer.Spec.Digit d := by
   rcases h with rfl | ⟨c, rest, rfl, hc, hr⟩
   · decide
   · exact List.forall_mem_cons.mpr ⟨⟨by
@@ -78,8 +78,8 @@ theorem ofDigitChars_ge (cs : List Char) (init : Nat) : init ≤ Nat.ofDigitChar
 
 /-- Digits with a first digit other than `0` are how their value is
     written. -/
-theorem toDigits_ofDigitChars_cons {c : Char} {rest : List Char} (hc : Spec.PositiveDigit c)
-    (hr : ∀ d ∈ rest, Spec.Digit d) :
+theorem toDigits_ofDigitChars_cons {c : Char} {rest : List Char} (hc : SemVer.Spec.PositiveDigit c)
+    (hr : ∀ d ∈ rest, SemVer.Spec.Digit d) :
     Nat.toDigits 10 (Nat.ofDigitChars 10 (c :: rest) 0) = c :: rest := by
   have hc' := (positiveDigit_iff c).mp hc
   induction rest using snoc_induction with
@@ -102,17 +102,17 @@ theorem toDigits_ofDigitChars_cons {c : Char} {rest : List Char} (hc : Spec.Posi
     show _ ++ [Nat.digitChar (x.toNat - 48)] = _
     rw [digitChar_toNat hx]
 
-theorem toDigits_ofDigitChars {cs : List Char} (h : Spec.NumericIdent cs) :
+theorem toDigits_ofDigitChars {cs : List Char} (h : SemVer.Spec.NumericIdent cs) :
     Nat.toDigits 10 (Nat.ofDigitChars 10 cs 0) = cs := by
   rcases h with rfl | ⟨c, rest, rfl, hc, hr⟩
   · decide
   · exact toDigits_ofDigitChars_cons hc hr
 
 theorem numericIdent_iff {cs : List Char} :
-    Spec.NumericIdent cs ↔ ∃ n, cs = Nat.toDigits 10 n :=
+    SemVer.Spec.NumericIdent cs ↔ ∃ n, cs = Nat.toDigits 10 n :=
   ⟨fun h => ⟨_, (toDigits_ofDigitChars h).symm⟩, fun ⟨n, h⟩ => h ▸ numericIdent_toDigits n⟩
 
-theorem all_isDigit_iff {cs : List Char} : cs.all isDigit = true ↔ ∀ d ∈ cs, Spec.Digit d := by
+theorem all_isDigit_iff {cs : List Char} : cs.all isDigit = true ↔ ∀ d ∈ cs, SemVer.Spec.Digit d := by
   simp [List.all_eq_true, isDigit_iff]
 
 theorem parseNumeric_eq_some {cs : List Char} {n : Nat} :
@@ -121,7 +121,7 @@ theorem parseNumeric_eq_some {cs : List Char} {n : Nat} :
   | nil => simp [parseNumeric, (Nat.toDigits_ne_nil).symm]
   | cons c cs =>
     have key : ((c :: cs).all isDigit && (c != '0' || cs.isEmpty)) = true ↔
-        Spec.NumericIdent (c :: cs) := by
+        SemVer.Spec.NumericIdent (c :: cs) := by
       rw [numericIdent_cons, Bool.and_eq_true, all_isDigit_iff, Bool.or_eq_true, bne_iff_ne,
         List.isEmpty_iff]
     rw [parseNumeric]

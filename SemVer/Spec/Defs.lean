@@ -2,7 +2,7 @@
   The definitions the specification uses, written from Semantic
   Versioning 2.0.0 (https://semver.org/spec/v2.0.0.html) independently
   of the code in `SemVer/`. Part of the approved specification, with
-  `Spec.lean` and `SemVer/Types.lean`.
+  `SemVer/Spec.lean` and `SemVer/Types.lean`.
 
   Both the challenge file and the proofs import this file, so each
   statement means the same thing on both sides. The `example`s check
@@ -28,28 +28,28 @@ From the Backus–Naur form grammar on semver.org:
 -/
 
 /-- `<digit>`. -/
-abbrev Spec.Digit (c : Char) : Prop := '0' ≤ c ∧ c ≤ '9'
+abbrev SemVer.Spec.Digit (c : Char) : Prop := '0' ≤ c ∧ c ≤ '9'
 
 /-- `<positive digit>`. -/
-abbrev Spec.PositiveDigit (c : Char) : Prop := '1' ≤ c ∧ c ≤ '9'
+abbrev SemVer.Spec.PositiveDigit (c : Char) : Prop := '1' ≤ c ∧ c ≤ '9'
 
 /-- `<letter>`: ASCII letters only. -/
-abbrev Spec.Letter (c : Char) : Prop := ('A' ≤ c ∧ c ≤ 'Z') ∨ ('a' ≤ c ∧ c ≤ 'z')
+abbrev SemVer.Spec.Letter (c : Char) : Prop := ('A' ≤ c ∧ c ≤ 'Z') ∨ ('a' ≤ c ∧ c ≤ 'z')
 
 /-- `<non-digit>`. -/
-abbrev Spec.NonDigit (c : Char) : Prop := Spec.Letter c ∨ c = '-'
+abbrev SemVer.Spec.NonDigit (c : Char) : Prop := SemVer.Spec.Letter c ∨ c = '-'
 
 /-- `<identifier character>`. -/
-abbrev Spec.IdentChar (c : Char) : Prop := Spec.Digit c ∨ Spec.NonDigit c
+abbrev SemVer.Spec.IdentChar (c : Char) : Prop := SemVer.Spec.Digit c ∨ SemVer.Spec.NonDigit c
 
-example : "0123456789".toList.all (fun c => decide (Spec.Digit c)) := by decide
-example : "123456789".toList.all (fun c => decide (Spec.PositiveDigit c)) := by decide
-example : ¬ Spec.PositiveDigit '0' := by decide
+example : "0123456789".toList.all (fun c => decide (SemVer.Spec.Digit c)) := by decide
+example : "123456789".toList.all (fun c => decide (SemVer.Spec.PositiveDigit c)) := by decide
+example : ¬ SemVer.Spec.PositiveDigit '0' := by decide
 example : ("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-".toList.all fun c =>
-    decide (Spec.NonDigit c)) := by decide
+    decide (SemVer.Spec.NonDigit c)) := by decide
 -- The neighbours of each range, and characters people mistake for
 -- them, are not identifier characters.
-example : ("/:@[`{.+_ \n٣０éα".toList.all fun c => !decide (Spec.IdentChar c)) := by decide
+example : ("/:@[`{.+_ \n٣０éα".toList.all fun c => !decide (SemVer.Spec.IdentChar c)) := by decide
 
 /-! ## The grammar
 
@@ -84,92 +84,92 @@ Each rule below is one of these, over lists of characters.
 -/
 
 /-- `<digits>`: one or more digits. -/
-def Spec.Digits (cs : List Char) : Prop := cs ≠ [] ∧ ∀ c ∈ cs, Spec.Digit c
+def SemVer.Spec.Digits (cs : List Char) : Prop := cs ≠ [] ∧ ∀ c ∈ cs, SemVer.Spec.Digit c
 
 /-- `<numeric identifier>`: `0`, or a positive digit followed by any
     number of digits. So no leading zero. -/
-def Spec.NumericIdent (cs : List Char) : Prop :=
-  cs = ['0'] ∨ ∃ c rest, cs = c :: rest ∧ Spec.PositiveDigit c ∧ ∀ d ∈ rest, Spec.Digit d
+def SemVer.Spec.NumericIdent (cs : List Char) : Prop :=
+  cs = ['0'] ∨ ∃ c rest, cs = c :: rest ∧ SemVer.Spec.PositiveDigit c ∧ ∀ d ∈ rest, SemVer.Spec.Digit d
 
 /-- `<alphanumeric identifier>`: the four forms of the rule together are
     a non-digit with any identifier characters, possibly none, before
     and after it. -/
-def Spec.AlnumIdent (cs : List Char) : Prop :=
-  ∃ xs c ys, cs = xs ++ c :: ys ∧ Spec.NonDigit c ∧
-    (∀ d ∈ xs, Spec.IdentChar d) ∧ ∀ d ∈ ys, Spec.IdentChar d
+def SemVer.Spec.AlnumIdent (cs : List Char) : Prop :=
+  ∃ xs c ys, cs = xs ++ c :: ys ∧ SemVer.Spec.NonDigit c ∧
+    (∀ d ∈ xs, SemVer.Spec.IdentChar d) ∧ ∀ d ∈ ys, SemVer.Spec.IdentChar d
 
 /-- `<pre-release identifier>`. -/
-def Spec.PreReleaseIdent (cs : List Char) : Prop :=
-  Spec.AlnumIdent cs ∨ Spec.NumericIdent cs
+def SemVer.Spec.PreReleaseIdent (cs : List Char) : Prop :=
+  SemVer.Spec.AlnumIdent cs ∨ SemVer.Spec.NumericIdent cs
 
 /-- `<build identifier>`. -/
-def Spec.BuildIdent (cs : List Char) : Prop :=
-  Spec.AlnumIdent cs ∨ Spec.Digits cs
+def SemVer.Spec.BuildIdent (cs : List Char) : Prop :=
+  SemVer.Spec.AlnumIdent cs ∨ SemVer.Spec.Digits cs
 
 /-- `<dot-separated ... identifiers>`: one or more parts, each of them
     meeting `P`, with `.` between each two. -/
-def Spec.DotSeparated (P : List Char → Prop) (cs : List Char) : Prop :=
+def SemVer.Spec.DotSeparated (P : List Char → Prop) (cs : List Char) : Prop :=
   ∃ parts, parts ≠ [] ∧ (∀ p ∈ parts, P p) ∧ cs = ['.'].intercalate parts
 
 /-- `<version core>`, from its three parts. -/
-def Spec.core (major minor patch : List Char) : List Char :=
+def SemVer.Spec.core (major minor patch : List Char) : List Char :=
   major ++ ['.'] ++ minor ++ ['.'] ++ patch
 
 /-- `<valid semver>`: the four forms of the rule. -/
-def Spec.ValidSemVer (cs : List Char) : Prop :=
+def SemVer.Spec.ValidSemVer (cs : List Char) : Prop :=
   ∃ major minor patch,
-    Spec.NumericIdent major ∧ Spec.NumericIdent minor ∧ Spec.NumericIdent patch ∧
-    (cs = Spec.core major minor patch ∨
-      (∃ pre, Spec.DotSeparated Spec.PreReleaseIdent pre ∧
-        cs = Spec.core major minor patch ++ ['-'] ++ pre) ∨
-      (∃ build, Spec.DotSeparated Spec.BuildIdent build ∧
-        cs = Spec.core major minor patch ++ ['+'] ++ build) ∨
-      (∃ pre build, Spec.DotSeparated Spec.PreReleaseIdent pre ∧
-        Spec.DotSeparated Spec.BuildIdent build ∧
-        cs = Spec.core major minor patch ++ ['-'] ++ pre ++ ['+'] ++ build))
+    SemVer.Spec.NumericIdent major ∧ SemVer.Spec.NumericIdent minor ∧ SemVer.Spec.NumericIdent patch ∧
+    (cs = SemVer.Spec.core major minor patch ∨
+      (∃ pre, SemVer.Spec.DotSeparated SemVer.Spec.PreReleaseIdent pre ∧
+        cs = SemVer.Spec.core major minor patch ++ ['-'] ++ pre) ∨
+      (∃ build, SemVer.Spec.DotSeparated SemVer.Spec.BuildIdent build ∧
+        cs = SemVer.Spec.core major minor patch ++ ['+'] ++ build) ∨
+      (∃ pre build, SemVer.Spec.DotSeparated SemVer.Spec.PreReleaseIdent pre ∧
+        SemVer.Spec.DotSeparated SemVer.Spec.BuildIdent build ∧
+        cs = SemVer.Spec.core major minor patch ++ ['-'] ++ pre ++ ['+'] ++ build))
 
 /-! ## Values -/
 
 /-- A natural number in decimal, as Lean's `Nat.repr` writes it: no
     leading zero, and `0` for zero. -/
-def Spec.decimal (n : Nat) : List Char := Nat.toDigits 10 n
+def SemVer.Spec.decimal (n : Nat) : List Char := Nat.toDigits 10 n
 
-example : Spec.decimal 0 = ['0'] := by decide
-example : Spec.decimal 7 = ['7'] := by decide
-example : Spec.decimal 1985 = "1985".toList := by decide
+example : SemVer.Spec.decimal 0 = ['0'] := by decide
+example : SemVer.Spec.decimal 7 = ['7'] := by decide
+example : SemVer.Spec.decimal 1985 = "1985".toList := by decide
 
 /-- A pre-release identifier as written. -/
-def Spec.identChars : Ident → List Char
-  | .num n => Spec.decimal n
+def SemVer.Spec.identChars : Ident → List Char
+  | .num n => SemVer.Spec.decimal n
   | .alnum s => s.toList
 
 /-- The string a version stands for: the three numbers, the pre-release
     identifiers after `-` and the build identifiers after `+`, each list
     joined by `.` and left out with its sign when it is empty. -/
-def Spec.render (v : Version) : List Char :=
-  Spec.core (Spec.decimal v.major) (Spec.decimal v.minor) (Spec.decimal v.patch) ++
-    (if v.pre = [] then [] else ['-'] ++ ['.'].intercalate (v.pre.map Spec.identChars)) ++
+def SemVer.Spec.render (v : Version) : List Char :=
+  SemVer.Spec.core (SemVer.Spec.decimal v.major) (SemVer.Spec.decimal v.minor) (SemVer.Spec.decimal v.patch) ++
+    (if v.pre = [] then [] else ['-'] ++ ['.'].intercalate (v.pre.map SemVer.Spec.identChars)) ++
     (if v.build = [] then [] else ['+'] ++ ['.'].intercalate (v.build.map String.toList))
 
-example : Spec.render ⟨1, 0, 0, [.alnum "alpha", .num 1], []⟩ = "1.0.0-alpha.1".toList := by
+example : SemVer.Spec.render ⟨1, 0, 0, [.alnum "alpha", .num 1], []⟩ = "1.0.0-alpha.1".toList := by
   decide
-example : Spec.render ⟨1, 0, 0, [.alnum "beta"], ["exp", "sha", "5114f85"]⟩ =
+example : SemVer.Spec.render ⟨1, 0, 0, [.alnum "beta"], ["exp", "sha", "5114f85"]⟩ =
     "1.0.0-beta+exp.sha.5114f85".toList := by decide
-example : Spec.render ⟨1, 0, 0, [], ["20130313144700"]⟩ = "1.0.0+20130313144700".toList := by
+example : SemVer.Spec.render ⟨1, 0, 0, [], ["20130313144700"]⟩ = "1.0.0+20130313144700".toList := by
   decide
 
 /-- A pre-release identifier is well formed when, as a number, it is any
     natural number, and otherwise when it is an alphanumeric identifier.
     An `alnum` of digits only is not well formed: those digits are a
     numeric identifier. -/
-def Spec.ValidIdent : Ident → Prop
+def SemVer.Spec.ValidIdent : Ident → Prop
   | .num _ => True
-  | .alnum s => Spec.AlnumIdent s.toList
+  | .alnum s => SemVer.Spec.AlnumIdent s.toList
 
 /-- A version is well formed when each of its identifiers is. The three
     numbers may be any natural numbers: SemVer sets no upper limit. -/
-def Spec.Valid (v : Version) : Prop :=
-  (∀ i ∈ v.pre, Spec.ValidIdent i) ∧ ∀ b ∈ v.build, Spec.BuildIdent b.toList
+def SemVer.Spec.Valid (v : Version) : Prop :=
+  (∀ i ∈ v.pre, SemVer.Spec.ValidIdent i) ∧ ∀ b ∈ v.build, SemVer.Spec.BuildIdent b.toList
 
 /-! ## Precedence: section 11
 
@@ -197,40 +197,40 @@ def Spec.Valid (v : Version) : Prop :=
 -/
 
 /-- Two numbers, compared numerically (11.2 and 11.4.1). -/
-def Spec.numOrder (a b : Nat) : Ordering :=
+def SemVer.Spec.numOrder (a b : Nat) : Ordering :=
   if a < b then .lt else if b < a then .gt else .eq
 
 /-- ASCII sort order (11.4.2): by the code of the first character that
     differs; when one string runs out first, it comes first. -/
-def Spec.asciiOrder : List Char → List Char → Ordering
+def SemVer.Spec.asciiOrder : List Char → List Char → Ordering
   | [], [] => .eq
   | [], _ :: _ => .lt
   | _ :: _, [] => .gt
   | a :: as, b :: bs =>
-    if a.toNat < b.toNat then .lt else if b.toNat < a.toNat then .gt else Spec.asciiOrder as bs
+    if a.toNat < b.toNat then .lt else if b.toNat < a.toNat then .gt else SemVer.Spec.asciiOrder as bs
 
-example : Spec.asciiOrder "alpha".toList "beta".toList = .lt := by decide
-example : Spec.asciiOrder "Z".toList "a".toList = .lt := by decide
-example : Spec.asciiOrder "-".toList "0a".toList = .lt := by decide
-example : Spec.asciiOrder "rc".toList "rc1".toList = .lt := by decide
+example : SemVer.Spec.asciiOrder "alpha".toList "beta".toList = .lt := by decide
+example : SemVer.Spec.asciiOrder "Z".toList "a".toList = .lt := by decide
+example : SemVer.Spec.asciiOrder "-".toList "0a".toList = .lt := by decide
+example : SemVer.Spec.asciiOrder "rc".toList "rc1".toList = .lt := by decide
 
 /-- Two pre-release identifiers: 11.4.1 to 11.4.3. -/
-def Spec.identOrder : Ident → Ident → Ordering
-  | .num a, .num b => Spec.numOrder a b
-  | .alnum a, .alnum b => Spec.asciiOrder a.toList b.toList
+def SemVer.Spec.identOrder : Ident → Ident → Ordering
+  | .num a, .num b => SemVer.Spec.numOrder a b
+  | .alnum a, .alnum b => SemVer.Spec.asciiOrder a.toList b.toList
   | .num _, .alnum _ => .lt
   | .alnum _, .num _ => .gt
 
 /-- Two lists of pre-release identifiers, from left to right until a
     difference is found (11.4); when one list runs out first, all of its
     identifiers being equal to the other's, it comes first (11.4.4). -/
-def Spec.preOrder : List Ident → List Ident → Ordering
+def SemVer.Spec.preOrder : List Ident → List Ident → Ordering
   | [], [] => .eq
   | [], _ :: _ => .lt
   | _ :: _, [] => .gt
   | a :: as, b :: bs =>
-    match Spec.identOrder a b with
-    | .eq => Spec.preOrder as bs
+    match SemVer.Spec.identOrder a b with
+    | .eq => SemVer.Spec.preOrder as bs
     | o => o
 
 /-- The precedence of `a` against `b`: `.lt` when `a` has lower
@@ -238,19 +238,19 @@ def Spec.preOrder : List Ident → List Ident → Ordering
     without a pre-release part above one with it (11.3), then the
     pre-release identifiers (11.4). Build identifiers are not read
     (11.1). -/
-def Spec.precedence (a b : Version) : Ordering :=
-  if a.major ≠ b.major then Spec.numOrder a.major b.major
-  else if a.minor ≠ b.minor then Spec.numOrder a.minor b.minor
-  else if a.patch ≠ b.patch then Spec.numOrder a.patch b.patch
+def SemVer.Spec.precedence (a b : Version) : Ordering :=
+  if a.major ≠ b.major then SemVer.Spec.numOrder a.major b.major
+  else if a.minor ≠ b.minor then SemVer.Spec.numOrder a.minor b.minor
+  else if a.patch ≠ b.patch then SemVer.Spec.numOrder a.patch b.patch
   else if a.pre = [] ∧ b.pre = [] then .eq
   else if a.pre = [] then .gt
   else if b.pre = [] then .lt
-  else Spec.preOrder a.pre b.pre
+  else SemVer.Spec.preOrder a.pre b.pre
 
 /-! ## Helpers for the test vectors -/
 
 /-- The precedence of two strings, when both parse. -/
-def Spec.compareStrings (s t : String) : Option Ordering := do
+def SemVer.Spec.compareStrings (s t : String) : Option Ordering := do
   let a ← parse s
   let b ← parse t
   pure (a.compare b)
