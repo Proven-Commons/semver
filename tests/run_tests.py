@@ -346,7 +346,7 @@ def cases(seed, count):
     for _ in range(count):
         r = rng.random()
         if r < 0.3:
-            yield parse_case("valid", random_version(rng))
+            yield parse_case("random version", random_version(rng))
         elif r < 0.75:
             base = random_version(rng)
             s = mutate(rng, base)
@@ -355,7 +355,7 @@ def cases(seed, count):
             yield parse_case("mutated", s, True)
         elif r < 0.85:
             n = rng.randint(0, 12)
-            yield parse_case("random", "".join(rng.choice("0123456789.-+aZ" + "".join(OTHER_CHARS[:3]))
+            yield parse_case("random string", "".join(rng.choice("0123456789.-+aZ" + "".join(OTHER_CHARS[:3]))
                                                for _ in range(n)))
         else:
             a = random_version(rng)

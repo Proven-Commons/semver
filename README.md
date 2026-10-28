@@ -71,11 +71,14 @@ Needs Linux, [elan](https://github.com/leanprover/elan), bubblewrap (`apt instal
 lake build
 lake comparator --paranoid
 python3 tests/run_tests.py
+python3 tests/plant_bugs.py
 ```
 
 `lake comparator --paranoid` builds the statements and the proofs in a sandbox. It checks that each theorem in `Proofs/` proves exactly the statement in `Spec.lean`, using only the axioms `propext`, `Classical.choice`, and `Quot.sound`, and replays it through every kernel shipped with Lean.
 
 The test script compares the tool with python-semver. It runs every string of up to eight characters over `0`, `1`, `.`, `-`, `+` and `a`, the examples of the specification, and random and mutated versions from a recorded seed, then compares pairs of versions. It then rewrites `tests/TEST-RESULTS.md`. When Python lacks python-semver 3.1.0, it installs it into `.lake/oracle-venv`, checked against the hashes in `tests/oracle-requirements.txt`.
+
+`tests/plant_bugs.py` plants ten bugs in a copy of the code, one at a time, and records in `tests/PLANTED-BUGS.md` how many failures the tests report for each. Every bug must be caught, and each of them also breaks a proof.
 
 ## Layout
 
@@ -91,3 +94,4 @@ The test script compares the tool with python-semver. It runs every string of up
 - `SPEC.md`: the specification in plain words.
 - `tests/run_tests.py`: the differential tests.
 - `tests/oracle-requirements.txt`: the oracle's version, pinned by hash.
+- `tests/plant_bugs.py` and `tests/PLANTED-BUGS.md`: the planted bugs, and the record that the tests catch each one.
