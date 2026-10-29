@@ -8,7 +8,7 @@
   file only.
 
   The definitions the statements use, written from Semantic Versioning
-  2.0.0, are in `Spec/Defs.lean`, and the types in `SemVer/Types.lean`.
+  2.0.0, are in `SemVer/Spec/Defs.lean`, and the types in `SemVer/Types.lean`.
   Both are part of the specification too.
 -/
 
