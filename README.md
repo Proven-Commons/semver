@@ -4,7 +4,7 @@ This library reads and writes Semantic Versioning 2.0.0 strings in Lean, and giv
 
 - The parser accepts exactly the strings of the grammar on semver.org, and nothing else.
 - It returns each part as written, and printing what it returns gives the string back.
-- `compare` follows the precedence rules of section 11, as `Spec/Defs.lean` states them.
+- `compare` follows the precedence rules of section 11, as `SemVer/Spec/Defs.lean` states them.
 - That order is consistent: swapping the sides swaps the answer, it is transitive, and two versions tie exactly when they differ in build metadata at most.
 
 So `01.0.0`, `1.0.0-01`, `v1.0.0`, `1.0` and `1.0.0 ` are rejected, `1.0.0-0a` and `1.0.0+001` are accepted, and numbers have no upper limit.
@@ -25,21 +25,21 @@ From Lean:
 
 ## What is proved
 
-The statements are in `Spec.lean`, the definitions they use in `Spec/Defs.lean`, and the proofs in `Proofs/`.
+The statements are in `SemVer/Spec.lean`, the definitions they use in `SemVer/Spec/Defs.lean`, and the proofs in `SemVer/Proofs/`.
 
 | Claim | Theorem |
 |-------|---------|
-| `print` writes the three numbers in decimal, then the pre-release and build identifiers, each part left out when it is empty. | `Spec.print_eq` |
-| `parse` returns a version exactly when the version is well formed and the string is how it is written. So it returns the parts as written, and there is one way to write each version. | `Spec.parse_iff` |
-| `parse` accepts exactly the strings of the grammar on semver.org, as `Spec/Defs.lean` writes it out. It rejects leading zeros in numbers and in numeric pre-release identifiers, empty identifiers, characters other than ASCII letters, digits and hyphens, and anything before or after the version. | `Spec.parse_isSome_iff` |
-| What `parse` returns is well formed. | `Spec.parse_valid` |
-| Printing a well formed version and parsing the result gives it back. | `Spec.parse_print` |
-| Parsing a string and printing the result gives the string back. | `Spec.print_parse` |
-| `compare` follows section 11: major, minor and patch as numbers, then a version with a pre-release part below one without, then the pre-release identifiers from the left, numbers as numbers and below other identifiers, other identifiers in ASCII order, and a shorter list first when it runs out. | `Spec.compare_eq` |
-| Build metadata plays no part: changing it on either side changes no answer. | `Spec.compare_build` |
-| Two versions have the same precedence exactly when they differ in build metadata at most. | `Spec.compare_eq_eq_iff` |
-| Swapping the two versions swaps the answer, and precedence is transitive. So sorting by it is consistent. | `Spec.compare_swap`, `Spec.compare_trans`, `Spec.compare_lt_trans` |
-| The examples of sections 9 to 11, both ways; a selection of strings outside the grammar; and strings inside it that loose parsers get wrong. | `Spec.semver_examples`, `Spec.precedence_examples`, `Spec.reject_vectors`, `Spec.accept_vectors` |
+| `print` writes the three numbers in decimal, then the pre-release and build identifiers, each part left out when it is empty. | `SemVer.Spec.print_eq` |
+| `parse` returns a version exactly when the version is well formed and the string is how it is written. So it returns the parts as written, and there is one way to write each version. | `SemVer.Spec.parse_iff` |
+| `parse` accepts exactly the strings of the grammar on semver.org, as `SemVer/Spec/Defs.lean` writes it out. It rejects leading zeros in numbers and in numeric pre-release identifiers, empty identifiers, characters other than ASCII letters, digits and hyphens, and anything before or after the version. | `SemVer.Spec.parse_isSome_iff` |
+| What `parse` returns is well formed. | `SemVer.Spec.parse_valid` |
+| Printing a well formed version and parsing the result gives it back. | `SemVer.Spec.parse_print` |
+| Parsing a string and printing the result gives the string back. | `SemVer.Spec.print_parse` |
+| `compare` follows section 11: major, minor and patch as numbers, then a version with a pre-release part below one without, then the pre-release identifiers from the left, numbers as numbers and below other identifiers, other identifiers in ASCII order, and a shorter list first when it runs out. | `SemVer.Spec.compare_eq` |
+| Build metadata plays no part: changing it on either side changes no answer. | `SemVer.Spec.compare_build` |
+| Two versions have the same precedence exactly when they differ in build metadata at most. | `SemVer.Spec.compare_eq_eq_iff` |
+| Swapping the two versions swaps the answer, and precedence is transitive. So sorting by it is consistent. | `SemVer.Spec.compare_swap`, `SemVer.Spec.compare_trans`, `SemVer.Spec.compare_lt_trans` |
+| The examples of sections 9 to 11, both ways; a selection of strings outside the grammar; and strings inside it that loose parsers get wrong. | `SemVer.Spec.semver_examples`, `SemVer.Spec.precedence_examples`, `SemVer.Spec.reject_vectors`, `SemVer.Spec.accept_vectors` |
 
 The command-line tool in `Main.lean` answers `parse` and `compare` requests with these functions directly.
 
@@ -74,7 +74,7 @@ python3 tests/run_tests.py
 python3 tests/plant_bugs.py
 ```
 
-`lake comparator --paranoid` builds the statements and the proofs in a sandbox. It checks that each theorem in `Proofs/` proves exactly the statement in `Spec.lean`, using only the axioms `propext`, `Classical.choice`, and `Quot.sound`, and replays it through every kernel shipped with Lean.
+`lake comparator --paranoid` builds the statements and the proofs in a sandbox. It checks that each theorem in `SemVer/Proofs/` proves exactly the statement in `SemVer/Spec.lean`, using only the axioms `propext`, `Classical.choice`, and `Quot.sound`, and replays it through every kernel shipped with Lean.
 
 The test script compares the tool with python-semver. It runs every string of up to eight characters over `0`, `1`, `.`, `-`, `+` and `a`, the examples of the specification, and random and mutated versions from a recorded seed, then compares pairs of versions. It then rewrites `tests/TEST-RESULTS.md`. When Python lacks python-semver 3.1.0, it installs it into `.lake/oracle-venv`, checked against the hashes in `tests/oracle-requirements.txt`.
 
@@ -84,9 +84,9 @@ The test script compares the tool with python-semver. It runs every string of up
 
 - `SemVer/Types.lean`: the `Version` and `Ident` types.
 - `SemVer/Basic.lean`: the code under proof.
-- `Spec.lean`: the statements, with `sorry` for proofs. A reviewer approves this file.
-- `Spec/Defs.lean`: the definitions the statements use, written from the grammar and section 11, with checks against the specification's examples.
-- `Proofs.lean` and `Proofs/`: the proofs, under the same names.
+- `SemVer/Spec.lean`: the statements, with `sorry` for proofs. A reviewer approves this file.
+- `SemVer/Spec/Defs.lean`: the definitions the statements use, written from the grammar and section 11, with checks against the specification's examples.
+- `SemVer/Proofs.lean` and `SemVer/Proofs/`: the proofs, under the same names.
 - `Main.lean`: the command-line tool the tests drive.
 - `lakefile.toml`: the build. It names the package and its version, its libraries and executable, and the default targets, and sets nothing else.
 - `comparator.json`: which theorems `lake comparator` checks, and which axioms it allows.

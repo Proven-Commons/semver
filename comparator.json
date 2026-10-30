@@ -1,12 +1,27 @@
 {
-  "challenge_module": "Spec",
-  "solution_module": "Proofs",
+  "challenge_module": "SemVer.Spec",
+  "solution_module": "SemVer.Proofs",
   "theorem_names": [
-    "Spec.print_eq", "Spec.parse_iff", "Spec.parse_isSome_iff", "Spec.parse_valid",
-    "Spec.parse_print", "Spec.print_parse", "Spec.compare_eq", "Spec.compare_build",
-    "Spec.compare_eq_eq_iff", "Spec.compare_swap", "Spec.compare_trans", "Spec.compare_lt_trans",
-    "Spec.semver_examples", "Spec.precedence_examples", "Spec.reject_vectors",
-    "Spec.accept_vectors"
+    "SemVer.Spec.print_eq",
+    "SemVer.Spec.parse_iff",
+    "SemVer.Spec.parse_isSome_iff",
+    "SemVer.Spec.parse_valid",
+    "SemVer.Spec.parse_print",
+    "SemVer.Spec.print_parse",
+    "SemVer.Spec.compare_eq",
+    "SemVer.Spec.compare_build",
+    "SemVer.Spec.compare_eq_eq_iff",
+    "SemVer.Spec.compare_swap",
+    "SemVer.Spec.compare_trans",
+    "SemVer.Spec.compare_lt_trans",
+    "SemVer.Spec.semver_examples",
+    "SemVer.Spec.precedence_examples",
+    "SemVer.Spec.reject_vectors",
+    "SemVer.Spec.accept_vectors"
   ],
-  "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"]
+  "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ]
 }

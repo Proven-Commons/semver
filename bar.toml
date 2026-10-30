@@ -16,7 +16,7 @@ entry_points = ["Main.lean"]
 [spec]
 # SemVer/Types.lean holds the types every statement is about, so it is
 # part of the specification.
-files = ["SPEC.md", "Spec.lean", "Spec/Defs.lean", "SemVer/Types.lean"]
+files = ["SPEC.md", "SemVer/Spec.lean", "SemVer/Spec/Defs.lean", "SemVer/Types.lean"]
 # The code under proof: the functions the statements are about.
 code = ["SemVer.parse", "SemVer.Version.print", "SemVer.Version.compare"]
 

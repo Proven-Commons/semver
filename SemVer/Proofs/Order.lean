@@ -1,11 +1,11 @@
 /-
-  Precedence: `Version.compare` against `Spec.precedence`, and the laws
+  Precedence: `Version.compare` against `SemVer.Spec.precedence`, and the laws
   that make it an order: swapping the sides swaps the answer, it is
   transitive, and `.eq` means the same numbers and pre-release
   identifiers.
 -/
 
-import Proofs.Chars
+import SemVer.Proofs.Chars
 
 open SemVer
 
@@ -13,51 +13,51 @@ namespace SemVer.Proofs
 
 /-! ## Against the specification -/
 
-theorem compare_nat (a b : Nat) : compare a b = Spec.numOrder a b := by
-  unfold Spec.numOrder
+theorem compare_nat (a b : Nat) : compare a b = SemVer.Spec.numOrder a b := by
+  unfold SemVer.Spec.numOrder
   split
   · exact Nat.compare_eq_lt.mpr ‹_›
   · split
     · exact Nat.compare_eq_gt.mpr ‹_›
     · exact Nat.compare_eq_eq.mpr (by omega)
 
-theorem compareAscii_eq : ∀ a b : List Char, compareAscii a b = Spec.asciiOrder a b
+theorem compareAscii_eq : ∀ a b : List Char, compareAscii a b = SemVer.Spec.asciiOrder a b
   | [], [] => rfl
   | [], _ :: _ => rfl
   | _ :: _, [] => rfl
   | x :: xs, y :: ys => by
-    simp only [compareAscii, Spec.asciiOrder, compare_nat, Spec.numOrder, compareAscii_eq xs ys]
+    simp only [compareAscii, SemVer.Spec.asciiOrder, compare_nat, SemVer.Spec.numOrder, compareAscii_eq xs ys]
     split
     · rfl
     · split
       · rfl
       · rfl
 
-theorem identCompare_eq (a b : Ident) : a.compare b = Spec.identOrder a b := by
-  cases a <;> cases b <;> simp [Ident.compare, Spec.identOrder, compare_nat, compareAscii_eq]
+theorem identCompare_eq (a b : Ident) : a.compare b = SemVer.Spec.identOrder a b := by
+  cases a <;> cases b <;> simp [Ident.compare, SemVer.Spec.identOrder, compare_nat, compareAscii_eq]
 
-theorem compareIdents_eq : ∀ a b : List Ident, compareIdents a b = Spec.preOrder a b
+theorem compareIdents_eq : ∀ a b : List Ident, compareIdents a b = SemVer.Spec.preOrder a b
   | [], [] => rfl
   | [], _ :: _ => rfl
   | _ :: _, [] => rfl
   | x :: xs, y :: ys => by
-    simp only [compareIdents, Spec.preOrder, identCompare_eq, compareIdents_eq xs ys]
-    cases Spec.identOrder x y <;> rfl
+    simp only [compareIdents, SemVer.Spec.preOrder, identCompare_eq, compareIdents_eq xs ys]
+    cases SemVer.Spec.identOrder x y <;> rfl
 
 theorem then_numOrder (a b : Nat) (r : Ordering) :
-    (compare a b).then r = if a ≠ b then Spec.numOrder a b else r := by
+    (compare a b).then r = if a ≠ b then SemVer.Spec.numOrder a b else r := by
   split
   · rename_i h
     have : compare a b ≠ .eq := fun e => h (Nat.compare_eq_eq.mp e)
     rw [compare_nat] at this ⊢
     revert this
-    cases Spec.numOrder a b <;> simp
+    cases SemVer.Spec.numOrder a b <;> simp
   · rename_i h
     rw [Nat.compare_eq_eq.mpr (Classical.not_not.mp h)]
     rfl
 
-theorem versionCompare_eq (a b : Version) : a.compare b = Spec.precedence a b := by
-  simp only [Version.compare, Spec.precedence, then_numOrder]
+theorem versionCompare_eq (a b : Version) : a.compare b = SemVer.Spec.precedence a b := by
+  simp only [Version.compare, SemVer.Spec.precedence, then_numOrder]
   split
   · rfl
   · split

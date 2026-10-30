@@ -1,16 +1,18 @@
 name = "semver"
 version = "0.1.0"
 license = "Apache-2.0"
-defaultTargets = ["SemVer", "Spec", "Proofs", "semver"]
+defaultTargets = ["SemVer", "SemVerSpec", "SemVerProofs", "semver"]
 
 [[lean_lib]]
 name = "SemVer"
 
 [[lean_lib]]
-name = "Spec"
+name = "SemVerSpec"
+roots = ["SemVer.Spec"]
 
 [[lean_lib]]
-name = "Proofs"
+name = "SemVerProofs"
+roots = ["SemVer.Proofs"]
 
 [[lean_exe]]
 name = "semver"
